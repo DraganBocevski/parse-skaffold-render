@@ -26,7 +26,7 @@ metadata:
     platform: dev
     chart: istio-0.0.1
     heritage: Helm
-    release: fraudalert-istio
+    release: my-istio
 spec:
   profile: empty
   components:
