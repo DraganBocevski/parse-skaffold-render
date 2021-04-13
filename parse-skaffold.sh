@@ -13,7 +13,7 @@
 # For example : # Source: my-istio/templates/ingressgw-istiooperator.yaml
 # This path is extracted and used to separate the manifests into directories
 
-ManifestsDir="Manifests"
+ManifestsDir="manifests"
 
 # The output manifests are generated in the $ManifestsDir dir
 rm -rf "$ManifestsDir"
