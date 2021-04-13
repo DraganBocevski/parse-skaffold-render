@@ -1,0 +1,97 @@
+---
+# Source: my-istio/templates/cert.yaml
+apiVersion: v1
+data:
+  tls.crt: xxx
+  tls.key: yyy
+kind: Secret
+metadata:
+  name: cert
+  namespace: dev
+type: kubernetes.io/tls
+---
+# Source: my-istio/templates/ingressgw-istiooperator.yaml
+# NOTE: not all changes done in the operator can be applied. For example, changing the selectors is not possible since the field in kubernetes is unmutable.
+# That means that is you wish to update an immutable fields either the operator should be manually removed or a better option will be to version the operator
+# with the name, in that case helm will be forced to remove the old operator and create new objects.
+
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: ingressgateway-dev
+  namespace: istio-system
+  labels:
+    app: istio-dev
+    istio: ingressgateway-dev
+    platform: dev
+    chart: istio-0.0.1
+    heritage: Helm
+    release: fraudalert-istio
+spec:
+  profile: empty
+  components:
+    ingressGateways:
+      - enabled: true
+        name: ingressgateway-dev
+        namespace: dev
+        k8s:
+          resources:
+            requests:
+              cpu: 200m
+          service:
+            type: LoadBalancer
+            ports:
+            - name: http
+              port: 80
+              protocol: TCP
+              targetPort: 80
+            - name: https
+              port: 443
+              protocol: TCP
+              targetPort: 443
+          overlays:
+          - apiVersion: networking.istio.io/v1alpha3
+            kind: Gateway
+            name: ingressgateway
+            patches:
+            - path: spec.servers
+              value:
+              - port:
+                  number: 80
+                  name: http
+                  protocol: HTTP
+                
+                tls:
+                  httpsRedirect: true
+                
+                hosts:
+                - "dev/*" # use all virtualservice hosts located in the dev namespace
+              
+              - port:
+                  number: 443
+                  name: https
+                  protocol: HTTPS
+                tls:
+                  mode: SIMPLE
+                  credentialName: cert
+                hosts:
+                - "dev/*" # use all virtualservice hosts located in the dev namespace
+              
+            - path: metadata.name
+              value: ingressgateway-dev
+            - path: spec.selector.istio
+              value: ingressgateway-dev
+          - kind: Service
+            name: ingressgateway-dev
+            patches:
+            - path: metadata.labels.istio
+              value: ingressgateway-dev
+            - path: spec.selector.istio
+              value: ingressgateway-dev
+          - kind: Deployment
+            name: ingressgateway-dev
+            patches:
+            - path: spec.selector.matchLabels.istio
+              value: ingressgateway-dev
+            - path: spec.template.metadata.labels.istio
+              value: ingressgateway-dev
