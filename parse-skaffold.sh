@@ -6,6 +6,9 @@
 # The script expects the input file to start with a "# Source" path to a file to start to write to 
 # Lines containing "---" are ignored
 
+# Script can also be invoked using pipes as in
+# cat render-file.yaml | parse-skaffold.sh
+
 # When skaffold render is used, skaffold keeps the source path information for every file
 # For example : # Source: my-istio/templates/ingressgw-istiooperator.yaml
 # This path is extracted and used to separate the manifests into directories
