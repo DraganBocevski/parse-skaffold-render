@@ -7,7 +7,7 @@
 # Lines containing "---" are ignored
 
 # When skaffold render is used, skaffold keeps the source path information for every file
-# For example : # Source: kfraud-istio/templates/ingressgw-istiooperator.yaml
+# For example : # Source: my-istio/templates/ingressgw-istiooperator.yaml
 # This path is extracted and used to separate the manifests into directories
 
 ManifestsDir="Manifests"
